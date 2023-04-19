@@ -128,7 +128,7 @@ class RoundRobinScheduler(Scheduler):
         return self.current_task
 
     def tick(self):
-        if not self.current_task:
+        if not self.current_task or self.task_time == self.time_slice:
             self.next_task()
         if self.current_task:
             self.current_task.tick()
@@ -137,8 +137,6 @@ class RoundRobinScheduler(Scheduler):
             self.task_time += 1
             if self.current_task.remaining == 0:
                 self.current_task = None
-                self.next_task()
-            elif self.task_time == self.time_slice:
                 self.next_task()
 
 
