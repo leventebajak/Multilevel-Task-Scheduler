@@ -1,4 +1,4 @@
-"""Baják Levente Imre, B5FWY3, 2023.04.18."""
+"""Baják Levente Imre, B5FWY3, 2023.04.19."""
 
 
 class Task:
@@ -107,7 +107,7 @@ class RoundRobinScheduler(Scheduler):
 
     def update(self):
         """A soron következő taszkok sorba állítása."""
-        for task in self.future_tasks:
+        for task in self.future_tasks.copy():
             if task.arrival < Scheduler.time:
                 self.task_queue.append(task)
                 self.future_tasks.remove(task)
@@ -150,7 +150,7 @@ class SRTFScheduler(Scheduler):
 
     def update(self):
         """A soron következő taszkok sorba állítása."""
-        for task in self.future_tasks:
+        for task in self.future_tasks.copy():
             if task.arrival < Scheduler.time:
                 self.task_queue.insert(0, task)
                 self.future_tasks.remove(task)
