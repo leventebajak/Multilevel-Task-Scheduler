@@ -144,14 +144,14 @@ class SRTFScheduler(Scheduler):
 
     def add_task(self, task):
         super().add_task(task)
-        self.future_tasks.sort(key=lambda x: x.name, reverse=True)
+        self.future_tasks.sort(key=lambda x: x.name)
         self.future_tasks.sort(key=lambda x: x.arrival)
 
     def update(self):
         """A soron következő taszkok sorba állítása."""
         for task in self.future_tasks.copy():
             if task.arrival < Scheduler.time:
-                self.task_queue.insert(0, task)
+                self.task_queue.append(task)
                 self.future_tasks.remove(task)
 
     def get_shortest(self):
@@ -220,10 +220,11 @@ class MultilevelScheduler:
         self.level0.update()
         if self.level1.task_queue or self.level1.current_task:
             self.level1.tick()
+            if self.level0.current_task:
+                self.level0.task_queue.append(self.level0.current_task)
+                self.level0.current_task = None
             for task in self.level0.task_queue:
                 task.wait += 1
-            if self.level0.current_task:
-                self.level0.current_task.wait += 1
         else:
             self.level0.tick()
 
