@@ -144,7 +144,7 @@ class SRTFScheduler(Scheduler):
 
     def add_task(self, task):
         super().add_task(task)
-        self.future_tasks.sort(key=lambda x: x.name)
+        self.future_tasks.sort(key=lambda x: x.name, reverse=True)
         self.future_tasks.sort(key=lambda x: x.arrival)
 
     def update(self):

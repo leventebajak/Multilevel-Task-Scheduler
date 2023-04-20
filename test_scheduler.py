@@ -93,21 +93,30 @@ class SchedulerTest(TestCase):
 
     def test_9(self):
         queue, runtimes = run_scheduler("""
-                                                A,1,2,7
-                                                B,0,4,2
-                                                C,1,2,2
-                                                D,1,2,1
-                                                """)
+                                        A,1,2,7
+                                        B,0,4,2
+                                        C,1,2,2
+                                        D,1,2,1
+                                        """)
         self.assertEqual(queue, "ACDAB")
         self.assertEqual(runtimes, ','.join(sorted("A:3,C:2,D:4,B:8".split(","))))
 
     def test_10(self):
         queue, runtimes = run_scheduler("""
-                                                A,0,0,5
-                                                B,0,1,1
-                                                C,0,3,1
-                                                D,0,3,3
-                                                E,0,4,1
-                                                """)
+                                        A,0,0,5
+                                        B,0,1,1
+                                        C,0,3,1
+                                        D,0,3,3
+                                        E,0,4,1
+                                        """)
         self.assertEqual(queue, "ABACEDA")
         self.assertEqual(runtimes, ','.join(sorted("A:6,B:0,C:0,D:2,E:0".split(","))))
+
+    def test_10(self):
+        queue, runtimes = run_scheduler("""
+                                        A,0,0,3
+                                        B,0,0,3
+                                        C,1,0,2
+                                        """)
+        self.assertEqual(queue, "CAB")
+        self.assertEqual(runtimes, ','.join(sorted("A:2,B:5,C:0".split(","))))
