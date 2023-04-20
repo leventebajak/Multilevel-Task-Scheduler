@@ -4,14 +4,22 @@
 class Task:
     """Taszkokat megvalósító osztály."""
 
-    queue = ""
-    runtimes = []
+    queue = ''
+    _wait_times = []
 
     @staticmethod
     def reset():
         """Statikus változók visszaállítása az alapértelmezett értékre"""
-        Task.queue = ""
-        Task.runtimes = []
+        Task.queue = ''
+        Task._wait_times = []
+
+    @staticmethod
+    def get_wait_times():
+        """A teljes várakozási idő taszkonként, érkezésük sorrendjében."""
+        wait_times = []
+        for task in sorted(sorted(Task._wait_times, key=lambda x: x[0]), key=lambda x: x[2]):
+            wait_times.append((task[0], task[1]))
+        return ','.join([':'.join(v) for v in wait_times])
 
     def __init__(self, input_str: str):
         """
@@ -29,7 +37,7 @@ class Task:
             raise ValueError('A taszk adatai hibásak!')
 
         self.name = input_list[0].strip().upper()
-        assert len(self.name) == 1 and self.name.isupper(), "A taszk betűjele egy nagybetű kell, hogy legyen!"
+        assert len(self.name) == 1 and self.name.isupper(), 'A taszk betűjele egy nagybetű kell, hogy legyen!'
         self.priority = int(input_list[1].strip())
         assert self.priority in {0, 1}, 'A taszk prioritása 0 vagy 1 lehet!'
         self.arrival = int(input_list[2].strip())
@@ -49,7 +57,7 @@ class Task:
                 Task.queue += self.name
             self.remaining -= 1
             if self.remaining == 0:
-                Task.runtimes.append((self.name, str(self.wait)))
+                Task._wait_times.append((self.name, str(self.wait), self.arrival))
 
 
 class Scheduler:
@@ -244,7 +252,7 @@ def main():
     while True:
         try:
             line = input()
-            if line == "":
+            if line == '':
                 break
             try:
                 scheduler.add_task(Task(line))
@@ -256,9 +264,8 @@ def main():
     scheduler.run()
 
     print(Task.queue)
-    Task.runtimes.sort(key=lambda x: x[0])
-    print(','.join([':'.join(v) for v in Task.runtimes]))
+    print(Task.get_wait_times())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
