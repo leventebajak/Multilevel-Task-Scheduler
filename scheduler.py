@@ -137,7 +137,6 @@ class RoundRobinScheduler(Scheduler):
             self.task_time += 1
             if self.current_task.remaining == 0:
                 self.current_task = None
-                self.next_task()
 
 
 class SRTFScheduler(Scheduler):
@@ -155,6 +154,18 @@ class SRTFScheduler(Scheduler):
                 self.task_queue.insert(0, task)
                 self.future_tasks.remove(task)
 
+    def get_shortest(self):
+        """
+        A legelső legkisebb hátralévő idővel rendelkező taszk megkeresése a taszk sorban.
+        Nem távolítja el a taszkot a taszk sorból.
+        :return: a legelső legkisebb hátralévő idővel rendelkező taszk
+        """
+        shortest = self.task_queue[0]
+        for task in self.task_queue:
+            if task.remaining < shortest.remaining:
+                shortest = task
+        return shortest
+
     def next_task(self):
         """A soron következő taszk meghatározása."""
         self.update()
@@ -162,14 +173,13 @@ class SRTFScheduler(Scheduler):
             return None
 
         if not self.current_task:
-            self.task_queue.sort(key=lambda x: x.name)
-            self.task_queue.sort(key=lambda x: x.remaining)
-            self.current_task = self.task_queue.pop(0)
+            self.current_task = self.get_shortest()
+            self.task_queue.remove(self.current_task)
         else:
-            self.task_queue.append(self.current_task)
-            self.task_queue.sort(key=lambda x: x.name)
-            self.task_queue.sort(key=lambda x: x.remaining)
-            self.current_task = self.task_queue.pop(0)
+            if self.current_task.remaining > self.get_shortest().remaining:
+                self.task_queue.append(self.current_task)
+                self.current_task = self.get_shortest()
+                self.task_queue.remove(self.current_task)
         return self.current_task
 
     def tick(self):
@@ -180,7 +190,6 @@ class SRTFScheduler(Scheduler):
                 task.wait += 1
             if self.current_task.remaining == 0:
                 self.current_task = None
-                self.next_task()
 
 
 class MultilevelScheduler:
